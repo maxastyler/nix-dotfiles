@@ -104,6 +104,14 @@ Use this directory instead of pumping out backup files into the wild
   (add-hook 'prog-mode-hook #'electric-pair-mode)
 #+END_SRC
 * Other Packages
+** Ace window
+Package to change between windows n that
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package ace-window
+    :config
+    (global-set-key (kbd "M-o") 'ace-window))
+#+END_SRC
+
 ** cider
    Add nicer repl interaction to clojure mode
 #+BEGIN_SRC emacs-lisp :results silent
@@ -127,11 +135,19 @@ Organisation package
     (add-hook 'after-init-hook #'global-company-mode)
     :config
     (setq company-minimum-prefix-length 2) ;; start completing after 2 characters
-    (setq company-idle-delay 0.2) ;; start completing after 2 characters
-    (define-key company-active-map (kbd "C-w") nil) ;; make ctrl-W still kill back a word when completing
-  )
+    (setq company-idle-delay 0.2) ;; start completing after 2 characters)
 #+END_SRC
 
+** DAP-mode
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package dap-mode
+    :defer t
+    :config
+    (dap-mode 1)
+    (dap-ui-mode 1)
+    (dap-tooltip-mode 1)
+    (tooltip-mode 1))
+#+END_SRC
 ** Doom Modeline
 #+BEGIN_SRC emacs-lisp :results silent
   (use-package doom-modeline
@@ -235,6 +251,37 @@ Used for code linting
         ))
   )
 #+END_SRC
+** Lispy 
+A package for editing lisp code
+#+begin_src emacs-lisp :results silent
+  (use-package lispy
+    :defer t
+    :config
+    (add-hook 'emacs-lisp-mode (lambda () (lispy-mode 1))))
+#+end_src
+** LSP-mode
+Language server protocol stuff
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package lsp-mode
+    ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+    :init (setq lsp-keymap-prefix "s-l")
+    :commands lsp
+    :config
+    (add-hook 'python-mode #'lsp)
+    (add-hook 'lsp-mode #'lsp-enable-which-key-integration))
+
+  ;; optionally
+  (use-package lsp-ui :commands lsp-ui-mode)
+  (use-package company-lsp :commands company-lsp)
+  ;; if you are helm user
+  (use-package helm-lsp :commands helm-lsp-workspace-symbol)
+
+  (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+  ;; optionally if you want to use debugger
+  (use-package dap-mode)
+  ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+#+END_SRC
 ** Magit
 A git porcelain for emacs
 #+BEGIN_SRC emacs-lisp :results silent
@@ -310,8 +357,7 @@ A better pdf viewer than doc-view
 ** popup-el
 A popup interface for emacs
 #+BEGIN_SRC emacs-lisp :results silent
-(use-package popup
-)
+  (use-package popup)
 #+END_SRC
 ** Projectile
 For managing projects in emacs
@@ -383,55 +429,6 @@ A package for dealing with latex in emacs. Add a buffer local hook to compile af
       )
   )
 #+END_SRC
-** Undo tree
-This package turns the undo tangle emacs usually has into an undo tree
-#+BEGIN_SRC emacs-lisp :results silent
-(use-package undo-tree
-:config
-(global-undo-tree-mode) ;; start undo-tree
-(setq undo-tree-visualizer-diff t) ;; add in a diff visualiser
-)
-#+END_SRC
-** Which-key 
-Which-key is located [[https://github.com/justbur/emacs-which-key][here]], and allows the user to see mapped keys
-
-#+BEGIN_SRC emacs-lisp :results silent
-(use-package which-key
-:config
-(which-key-mode 1)
-)
-#+END_SRC
-
-** Ace window
-Package to change between windows n that
-#+BEGIN_SRC emacs-lisp :results silent
-  (use-package ace-window
-    :config
-    (global-set-key (kbd "M-o") 'ace-window))
-#+END_SRC
-
-** yasnippet 
-   Snippets
-#+BEGIN_SRC emacs-lisp :results silent
-  (use-package yasnippet
-    :defer t
-    :config
-    (yas-global-mode t)
-    (yas-reload-all))
-#+END_SRC
-** Yasnippet Snippets
-Official snippets for yasnippet
-#+BEGIN_SRC emacs-lisp :results silent
-  (use-package yasnippet-snippets)
-#+END_SRC
-** Lispy 
-A package for editing lisp code
-#+begin_src emacs-lisp :results silent
-  (use-package lispy
-    :defer t
-    :config
-    (add-hook 'emacs-lisp-mode (lambda () (lispy-mode 1))))
-#+end_src
 ** Treemacs
 #+BEGIN_SRC emacs-lisp :results silent
   (use-package treemacs
@@ -448,38 +445,34 @@ A package for editing lisp code
   (use-package treemacs-projectile
     :after treemacs projectile)
 #+END_SRC
-** LSP-mode
-Language server protocol stuff
+** Undo tree
+This package turns the undo tangle emacs usually has into an undo tree
 #+BEGIN_SRC emacs-lisp :results silent
-  (use-package lsp-mode
-    :defer t)
-
-  (use-package lsp-ui
-    :defer t
-    :after lsp-mode
-    :hook lsp-mode-hook)
-
-  (use-package company-lsp
-    :defer t
-    :after (company lsp-mode)
+  (use-package undo-tree
     :config
-    (push 'company-lsp company-backends))
-
-  (use-package lsp-treemacs
-    :after (lsp-mode treemacs)
-    :config
-    (add-hook 'lsp-mode-hook (lambda () (lsp-treemacs-sync-mode 1))))
-
-  (use-package helm-lsp
-    :after (helm lsp-mode))
+    (global-undo-tree-mode) ;; start undo-tree
+    (setq undo-tree-visualizer-diff t) ;; add in a diff visualiser)
 #+END_SRC
-** DAP-mode
+** Which-key 
+Which-key is located [[https://github.com/justbur/emacs-which-key][here]], and allows the user to see mapped keys
+
 #+BEGIN_SRC emacs-lisp :results silent
-  (use-package dap-mode
+  (use-package which-key
+    :config
+    (which-key-mode 1))
+#+END_SRC
+
+** yasnippet 
+   Snippets
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package yasnippet
     :defer t
     :config
-    (dap-mode 1)
-    (dap-ui-mode 1)
-    (dap-tooltip-mode 1)
-    (tooltip-mode 1))
+    (yas-global-mode t)
+    (yas-reload-all))
+#+END_SRC
+** Yasnippet Snippets
+Official snippets for yasnippet
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package yasnippet-snippets)
 #+END_SRC
