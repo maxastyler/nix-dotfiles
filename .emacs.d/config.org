@@ -1,0 +1,485 @@
+#+OPTIONS: toc:nil
+* Things to do
+** DONE Linting
+*** Add flycheck to emacs
+** DONE Set up pdf-tools to open pdf files instead of doc-view
+** TODO Fix keymappings [3/4]
+*** DONE Look at evil-leader to see if this is still useful
+It's quite an old extension, so there might be something better now
+- No, it's not going to be useful
+*** TODO Look at hydra
+Don't know if this is useful with evil?
+No, don't use hydra
+*** DONE Use general for keymappings
+    Have a look at these dotfiles for an example https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-pdf.el
+*** DONE Fix helm keybindings
+Use C-{h,j,k,l} rather than M-{...} for moving between things in a helm buffer
+** DONE Completion
+   Add in some completion package
+   Maybe [[http://company-mode.github.io/]]
+*** TODO Look for a good completion package
+** TODO EMMS
+Media player in emacs - works with mpv as a backend
+** DONE Set up commands to jump to wanted files
+   For example, jump to emacs config directly
+** DONE Add in org-ref for referencing stuff (instead of zotero, etc)
+** TODO Look at minted for viewing latex fragments
+https://github.com/gpoore/minted
+** DONE Look at persp mode for workspaces, etc.
+https://github.com/Bad-ptr/persp-mode.el
+** DONE Make helm always open in buffer below the windows 
+rather than in the last buffer
+** TODO Make racer jump to definition work correctly with evil mode jump
+When using racer jump to definition, evil mode doesn't record the jumps correctly
+** TODO Make emacs work well under nix
+** TODO check if spaceline is working
+   - use with eyebrowse/persp-mode
+** DONE See if persp-mode is worth it over (with?) eyebrowse
+** DONE set up ivy/projectile keybindings
+   - Maybe use C-z C-? for the different keys? That's free
+** DONE Add magit to keymaps - C-z C-g?
+** TODO Check out aweshell - and eshell extension (not in melpa?)
+** TODO Set up up spaceline with winum/eyebrowse
+** TODO Set up multi-term
+* Useful things
+** Emacs keymap guide
+[[https://www.masteringemacs.org/article/mastering-key-bindings-emacs]] is a guide for emacs keymaps.
+** EVIL mode guide
+[[https://github.com/noctuid/evil-guide]] is a guide for EVIL mode
+* Basic Setup
+** Set Some Default Variables
+#+BEGIN_SRC emacs-lisp :results silent
+  (setq-default
+   confirm-kill-emacs 'yes-or-no-p 	; confirmation when killing emacs
+   indent-tabs-mode nil 			; don't use tabs to indent
+   select-enable-clipboard t 		; use the system clipboard
+   gc-cons-threshold 3200000        ; set the garbage collection threshold higher
+   ;; inhibit-startup-screen t
+   initial-scratch-message nil
+   initial-major-mode 'org-mode
+   doc-view-continuous t        ; in doc mode, scroll over pages
+   backup-directory-alist `(("." . "~/.emacs.d/backups")) ; which directory to put backups file
+   auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)) ;transform backups file name
+   winner-mode 1 ;; winner mode lets you undo window config mistakes
+   tab-width 4) 				; tab width to 4
+#+END_SRC
+** yes-or-no to y-or-n
+Stop asking for me to type in the full "yes" or "no"
+when a "y" or "n" would do...
+#+BEGIN_SRC emacs-lisp :results silent
+(fset 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+** Turn off cursor blinking
+#+BEGIN_SRC emacs-lisp :results silent
+(blink-cursor-mode 0)
+#+END_SRC
+** Set a Backup Directory
+Use this directory instead of pumping out backup files into the wild
+#+BEGIN_SRC emacs-lisp :results silent
+(setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
+      backup-by-copying t
+      version-control t
+      delete-old-versions t
+      kept-new-versions 20
+      kept-old-versions 5)
+#+END_SRC
+** Use package settings
+#+BEGIN_SRC emacs-lisp :results silent
+(setq-default 
+    use-package-always-ensure t
+)
+#+END_SRC
+** Add matching parentheses to prog modes
+#+BEGIN_SRC emacs-lisp :results silent
+  (add-hook 'prog-mode-hook #'show-paren-mode)
+#+END_SRC
+** Add files to registers
+#+BEGIN_SRC emacs-lisp :results silent
+  (set-register ?e (cons 'file "~/.emacs.d/config.org"))
+  (set-register ?n (cons 'file "/etc/nixos/nixos-config/configuration.nix"))
+  (set-register ?p (cons 'file "/etc/nixos/nixos-config/packages.nix"))
+#+END_SRC
+** Use electric pair mode in prog-mode
+#+BEGIN_SRC emacs-lisp :results silent
+  (add-hook 'prog-mode-hook #'electric-pair-mode)
+#+END_SRC
+* Other Packages
+** cider
+   Add nicer repl interaction to clojure mode
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package cider
+    :defer t
+    :config
+    (add-hook 'clojure-mode-hook #'cider-mode))
+#+END_SRC
+
+** clojure-mode
+   Add a clojure mode
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package clojure-mode)
+#+END_SRC
+
+** company
+Organisation package
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package company
+    :init
+    (add-hook 'after-init-hook #'global-company-mode)
+    :config
+    (setq company-minimum-prefix-length 2) ;; start completing after 2 characters
+    (setq company-idle-delay 0.2) ;; start completing after 2 characters
+    (define-key company-active-map (kbd "C-w") nil) ;; make ctrl-W still kill back a word when completing
+  )
+#+END_SRC
+
+** Doom Modeline
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package doom-modeline
+        :ensure t
+        :hook (after-init . doom-modeline-mode)
+        :config
+        (setq doom-modeline-height 1)
+        (set-face-attribute 'mode-line nil :height 100)
+        (set-face-attribute 'mode-line-inactive nil :height 100))
+#+END_SRC
+   
+** dracula-theme
+   Add dracula theme
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package dracula-theme
+    :config
+    (load-theme 'dracula t))
+#+END_SRC
+
+** ELPY
+A nice python mode
+#+begin_src emacs-lisp :results silent
+  (use-package elpy
+    :disabled
+    :defer t
+    :init
+    (advice-add 'python-mode :before 'elpy-enable)
+    :config
+    (add-hook 'python-mode-hook #'elpy-mode))
+#+end_src
+
+** Emacs-async
+To allow for asynchronous stuff
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package async)
+#+END_SRC
+** eyebrowse
+   For managing multiple windows
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package eyebrowse
+    :config
+    (eyebrowse-mode 1))
+#+END_SRC
+** flycheck
+Used for code linting
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package flycheck
+    :config
+    (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
+    (global-flycheck-mode))
+#+END_SRC
+** Helm
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package helm
+    :init
+    (global-set-key (kbd "M-x") #'helm-M-x)
+    (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
+    (global-set-key (kbd "C-x C-f") #'helm-find-files)
+    (setq helm-default-display-buffer-functions '(display-buffer-in-side-window))
+    (setq helm-display-buffer-default-height 15)
+    :config
+    (helm-mode 1))
+#+END_SRC
+** helm-bibtex
+   Use helm to search through bibtex
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package helm-bibtex
+    :after helm
+    :config
+    (setq bibtex-completion-bibliography
+          '("~/git/notes/bibliography/references.bib"))
+    (setq bibtex-completion-library-path '("~/git/notes/bibliography/pdfs/"))
+    (setq bibtex-completion-notes-path "~/git/notes/bibliography/bib_notes.org")
+    )
+#+END_SRC
+** Helm Swoop
+   Package for doing isearch kinda stuff
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package helm-swoop
+    :after (helm)
+    :config
+    ;; C-s in a buffer: open helm-swoop with empty search field
+
+    ;; (global-set-key (kbd "C-s") 'helm-swoop)
+    (with-eval-after-load 'helm-swoop
+      (setq helm-swoop-pre-input-function
+            (lambda () nil)))
+
+    ;; C-s in helm-swoop with empty search field: activate previous search.
+    ;; C-s in helm-swoop with non-empty search field: go to next match.
+    (with-eval-after-load 'helm-swoop
+      (define-key helm-swoop-map (kbd "C-s") 'tl/helm-swoop-C-s))
+
+    (defun tl/helm-swoop-C-s ()
+      (interactive)
+      (if (boundp 'helm-swoop-pattern)
+          (if (equal helm-swoop-pattern "")
+              (previous-history-element 1)
+            (helm-next-line))
+        (helm-next-line)
+        ))
+  )
+#+END_SRC
+** Magit
+A git porcelain for emacs
+#+BEGIN_SRC emacs-lisp :results silent
+(use-package magit
+)
+#+END_SRC
+** Multi Term
+Allow multiple terminals
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package multi-term
+    :defer t
+    :config
+    (setq multi-term-program "/run/current-system/sw/bin/bash")
+    (global-set-key (kbd "C-c t t") 'multi-term-dedicated-toggle)
+    (global-set-key (kbd "C-c t n") 'multi-term)
+    (global-set-key (kbd "C-c t f") 'multi-term-next)
+    (global-set-key (kbd "C-c t b") 'multi-term-prev)
+    (define-key term-raw-map (kbd "M-o") nil))
+#+END_SRC
+
+** org
+Organisation package
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package org
+    :config
+    (setq org-return-follows-link t)
+    (setq org-directory "~/git/notes")
+    (setq org-default-notes-file (concat org-directory "/notes.org"))
+    (setq org-agenda-files (list org-directory))
+    ;; set up my keymaps
+    (global-set-key (kbd "C-c l") 'org-store-link)
+    (global-set-key (kbd "C-c a") 'org-agenda)
+    (global-set-key (kbd "C-c c") 'org-capture)
+    ;; set up my capture templates
+    (setq org-capture-templates
+          '(("t" "Todo" entry (file+headline org-default-notes-file "Tasks")
+             "* TODO %?\n  %i\n  %a")
+            ("j" "Journal" entry (file+datetree org-default-notes-file)
+             "* %?\nEntered on %U\n  %i\n  %a")))
+    (org-babel-do-load-languages ;; load the languages for org-babel
+     'org-babel-load-languages
+     '((python . t)
+       (emacs-lisp . t)
+       (C . t)
+       (latex . t)
+       (clojure . t))))
+#+END_SRC
+** org-bullets
+Get nice bullet points in org
+#+BEGIN_SRC emacs-lisp :results silent
+(use-package org-bullets
+  :hook (org-mode . org-bullets-mode))
+#+END_SRC
+** org-ref
+Org reference manager
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package org-ref
+    :defer t
+    :config
+    ;; see org-ref for use of these variables
+    (setq org-ref-bibliography-notes "~/git/notes/bibliography/bib_notes.org"
+          org-ref-default-bibliography '("~/git/notes/bibliography/references.bib")
+          org-ref-pdf-directory "~/git/notes/bibliography/pdfs/"))
+#+END_SRC
+** pdf-tools
+A better pdf viewer than doc-view
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package pdf-tools
+    :defer t
+    :config
+    (pdf-tools-install))
+#+END_SRC
+** popup-el
+A popup interface for emacs
+#+BEGIN_SRC emacs-lisp :results silent
+(use-package popup
+)
+#+END_SRC
+** Projectile
+For managing projects in emacs
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package projectile
+    :defer t
+    :init
+    (global-set-key (kbd "C-c f") #'projectile-find-file)
+    (global-set-key (kbd "C-c p") #'projectile-switch-project)
+    :config 
+    (setq projectile-completion-system 'helm)
+    (projectile-mode)
+  )
+#+END_SRC
+
+** Rainbow Delimiters
+Colour matching parens
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package rainbow-delimiters
+    :config
+    (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+  )
+#+END_SRC
+** reftex
+A package for dealing with latex in emacs
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package reftex
+    :defer t
+    :hook (LaTeX-mode . turn-on-reftex)
+    :config
+    (setq reftex-plug-into-AUCTeX t)
+    (setq reftex-default-bibliography '("~/git/notes/bibliography/references.bib"))
+  )
+#+END_SRC
+** ripgrep
+   Front end for ripgrep
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package ripgrep
+    :defer t)
+#+END_SRC
+
+** tex
+A package for dealing with latex in emacs. Add a buffer local hook to compile after saving.
+
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package tex
+    :ensure auctex ;; install the package if it's not installed already
+    :mode ("\\.tex\\'" . TeX-latex-mode)
+    :config
+    (setq TeX-auto-save t)
+    (setq TeX-parse-self t)
+    (setq TeX-PDF-mode t)
+    (setq-default TeX-master nil)
+    (setq TeX-source-correlate-start-server 'synctex)
+    (setq TeX-view-program-selection '(((output-dvi has-no-display-manager)
+                                        "dvi2tty")
+                                       ((output-dvi style-pstricks)
+                                        "dvips and gv")
+                                       (output-dvi "xdvi")
+                                       (output-pdf "PDF Tools")
+                                       (output-html "xdg-open")))
+    :init
+    (add-hook 'LaTeX-mode-hook #'my-LaTeX-mode-hooks)
+    (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+    (defun my-LaTeX-mode-hooks ()
+      (TeX-source-correlate-mode t)
+      (LaTeX-math-mode t)
+      (add-hook 'after-save-hook (lambda () (TeX-command-run-all nil)) nil t) ;; save after compilation
+      )
+  )
+#+END_SRC
+** Undo tree
+This package turns the undo tangle emacs usually has into an undo tree
+#+BEGIN_SRC emacs-lisp :results silent
+(use-package undo-tree
+:config
+(global-undo-tree-mode) ;; start undo-tree
+(setq undo-tree-visualizer-diff t) ;; add in a diff visualiser
+)
+#+END_SRC
+** Which-key 
+Which-key is located [[https://github.com/justbur/emacs-which-key][here]], and allows the user to see mapped keys
+
+#+BEGIN_SRC emacs-lisp :results silent
+(use-package which-key
+:config
+(which-key-mode 1)
+)
+#+END_SRC
+
+** Ace window
+Package to change between windows n that
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package ace-window
+    :config
+    (global-set-key (kbd "M-o") 'ace-window))
+#+END_SRC
+
+** yasnippet 
+   Snippets
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package yasnippet
+    :defer t
+    :config
+    (yas-global-mode t)
+    (yas-reload-all))
+#+END_SRC
+** Yasnippet Snippets
+Official snippets for yasnippet
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package yasnippet-snippets)
+#+END_SRC
+** Lispy 
+A package for editing lisp code
+#+begin_src emacs-lisp :results silent
+  (use-package lispy
+    :defer t
+    :config
+    (add-hook 'emacs-lisp-mode (lambda () (lispy-mode 1))))
+#+end_src
+** Treemacs
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package treemacs
+    :defer t
+    :bind
+    (:map global-map
+          ("M-0"       . treemacs-select-window)
+          ("C-x t 1"   . treemacs-delete-other-windows)
+          ("C-x t t"   . treemacs)
+          ("C-x t B"   . treemacs-bookmark)
+          ("C-x t C-t" . treemacs-find-file)
+          ("C-x t M-t" . treemacs-find-tag)))
+
+  (use-package treemacs-projectile
+    :after treemacs projectile)
+#+END_SRC
+** LSP-mode
+Language server protocol stuff
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package lsp-mode
+    :defer t)
+
+  (use-package lsp-ui
+    :defer t
+    :after lsp-mode
+    :hook lsp-mode-hook)
+
+  (use-package company-lsp
+    :defer t
+    :after (company lsp-mode)
+    :config
+    (push 'company-lsp company-backends))
+
+  (use-package lsp-treemacs
+    :after (lsp-mode treemacs)
+    :config
+    (add-hook 'lsp-mode-hook (lambda () (lsp-treemacs-sync-mode 1))))
+
+  (use-package helm-lsp
+    :after (helm lsp-mode))
+#+END_SRC
+** DAP-mode
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package dap-mode
+    :defer t
+    :config
+    (dap-mode 1)
+    (dap-ui-mode 1)
+    (dap-tooltip-mode 1)
+    (tooltip-mode 1))
+#+END_SRC
