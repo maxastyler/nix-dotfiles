@@ -102,13 +102,6 @@ Use this directory instead of pumping out backup files into the wild
 #+BEGIN_SRC emacs-lisp :results silent
   (add-hook 'prog-mode-hook #'electric-pair-mode)
 #+END_SRC
-** Set the custom-file
-Instead of putting custom variables into the config, put them into a separate file
-#+BEGIN_SRC emacs-lisp :results silent
-  (setq custom-file "~/.emacs.d/custom.el")
-  (load-file custom-file)
-#+END_SRC
-
 * Other Packages
 ** Ace window
 Package to change between windows n that
@@ -141,7 +134,7 @@ Completion mode
     (add-hook 'after-init-hook #'global-company-mode)
     :config
     (setq company-minimum-prefix-length 2) ;; start completing after 2 characters
-    (setq company-idle-delay 0.2) ;; start completing after 2 characters)
+    (setq company-idle-delay 0.2))
 #+END_SRC
 
 ** DAP-mode
@@ -291,8 +284,7 @@ Language server protocol stuff
 ** Magit
 A git porcelain for emacs
 #+BEGIN_SRC emacs-lisp :results silent
-(use-package magit
-)
+  (use-package magit)
 #+END_SRC
 ** Multi Term
 Allow multiple terminals
@@ -352,7 +344,6 @@ Get nice bullet points in org
 Org reference manager
 #+BEGIN_SRC emacs-lisp :results silent
   (use-package org-ref
-    :defer t
     :config
     ;; see org-ref for use of these variables
     (setq org-ref-bibliography-notes "~/git/notes/bibliography/bib_notes.org"
@@ -363,7 +354,6 @@ Org reference manager
 A better pdf viewer than doc-view
 #+BEGIN_SRC emacs-lisp :results silent
   (use-package pdf-tools
-    :defer t
     :config
     (pdf-tools-install))
 #+END_SRC
@@ -402,8 +392,7 @@ A package for dealing with latex in emacs
     :hook (LaTeX-mode . turn-on-reftex)
     :config
     (setq reftex-plug-into-AUCTeX t)
-    (setq reftex-default-bibliography '("~/git/notes/bibliography/references.bib"))
-  )
+    (setq reftex-default-bibliography '("~/git/notes/bibliography/references.bib")))
 #+END_SRC
 ** ripgrep
    Front end for ripgrep
@@ -464,7 +453,7 @@ This package turns the undo tangle emacs usually has into an undo tree
   (use-package undo-tree
     :config
     (global-undo-tree-mode) ;; start undo-tree
-    (setq undo-tree-visualizer-diff t) ;; add in a diff visualiser)
+    (setq undo-tree-visualizer-diff t))
 #+END_SRC
 ** Which-key 
 Which-key is located [[https://github.com/justbur/emacs-which-key][here]], and allows the user to see mapped keys
