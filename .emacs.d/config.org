@@ -44,8 +44,7 @@ When using racer jump to definition, evil mode doesn't record the jumps correctl
 * Useful things
 ** Emacs keymap guide
 [[https://www.masteringemacs.org/article/mastering-key-bindings-emacs]] is a guide for emacs keymaps.
-** EVIL mode guide
-[[https://github.com/noctuid/evil-guide]] is a guide for EVIL mode
+
 * Basic Setup
 ** Set Some Default Variables
 #+BEGIN_SRC emacs-lisp :results silent
@@ -103,6 +102,11 @@ Use this directory instead of pumping out backup files into the wild
 #+BEGIN_SRC emacs-lisp :results silent
   (add-hook 'prog-mode-hook #'electric-pair-mode)
 #+END_SRC
+** Don't let C-z suspend
+#+BEGIN_SRC emacs-lisp :results silent
+  (global-unset-key (kbd "C-z"))
+  (global-unset-key (kbd "C-x C-z"))
+#+END_SRC
 * Other Packages
 ** Ace window
 Package to change between windows n that
@@ -148,10 +152,15 @@ Completion mode
     (dap-tooltip-mode 1)
     (tooltip-mode 1))
 #+END_SRC
+** direnv
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package direnv
+    :config
+    (direnv-mode t))
+#+END_SRC
 ** Doom Modeline
 #+BEGIN_SRC emacs-lisp :results silent
   (use-package doom-modeline
-        :ensure t
         :hook (after-init . doom-modeline-mode)
         :config
         (setq doom-modeline-height 1)
@@ -251,6 +260,13 @@ Used for code linting
         ))
   )
 #+END_SRC
+** Hy Lang
+A language that's a lisp but transpiles to python
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package hy-mode
+    :mode "\\.hy\\'")
+#+END_SRC
+
 ** Lispy 
 A package for editing lisp code
 #+begin_src emacs-lisp :results silent
