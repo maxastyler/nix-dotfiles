@@ -61,6 +61,7 @@ When using racer jump to definition, evil mode doesn't record the jumps correctl
    backup-directory-alist `(("." . "~/.emacs.d/backups")) ; which directory to put backups file
    auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)) ;transform backups file name
    winner-mode 1 ;; winner mode lets you undo window config mistakes
+   custom-file (expand-file-name "custom.el" user-emacs-directory)
    tab-width 4) 				; tab width to 4
 #+END_SRC
 ** yes-or-no to y-or-n
@@ -399,6 +400,17 @@ A package for dealing with latex in emacs
 #+BEGIN_SRC emacs-lisp :results silent
   (use-package ripgrep
     :defer t)
+#+END_SRC
+** Rust
+Use rust-mode
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package rust-mode
+    :defer t)
+
+  (use-package cargo
+    :defer t
+    :config
+    (add-hook 'rust-mode-hook 'cargo-minor-mode))
 #+END_SRC
 
 ** tex

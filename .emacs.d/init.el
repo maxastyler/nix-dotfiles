@@ -23,4 +23,8 @@
   (require 'use-package))
 
 ;; Load the literate configuration
-(org-babel-load-file (expand-file-name "config.org" user-emacs-directory))
+;; expand the symlink first so that it gets the right date
+(org-babel-load-file (file-truename
+                      (expand-file-name
+                       "config.org"
+                       user-emacs-directory)))
