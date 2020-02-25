@@ -323,33 +323,38 @@ Mode for syntax highlighting n that
     :defer t
     :mode "\\.nix\\'")
 #+end_src
-
+** Org Babel
+Use the OB ipython package for nice jupyter integration with org
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package ob-ipython)
+#+END_SRC
 ** org
 Organisation package
 #+BEGIN_SRC emacs-lisp :results silent
-  (use-package org
-    :config
-    (setq org-return-follows-link t)
-    (setq org-directory "~/git/notes")
-    (setq org-default-notes-file (concat org-directory "/notes.org"))
-    (setq org-agenda-files (list org-directory))
-    ;; set up my keymaps
-    (global-set-key (kbd "C-c l") 'org-store-link)
-    (global-set-key (kbd "C-c a") 'org-agenda)
-    (global-set-key (kbd "C-c c") 'org-capture)
-    ;; set up my capture templates
-    (setq org-capture-templates
-          '(("t" "Todo" entry (file+headline org-default-notes-file "Tasks")
-             "* TODO %?\n  %i\n  %a")
-            ("j" "Journal" entry (file+datetree org-default-notes-file)
-             "* %?\nEntered on %U\n  %i\n  %a")))
-    (org-babel-do-load-languages ;; load the languages for org-babel
-     'org-babel-load-languages
-     '((python . t)
-       (emacs-lisp . t)
-       (C . t)
-       (latex . t)
-       (clojure . t))))
+    (use-package org
+      :config
+      (setq org-return-follows-link t)
+      (setq org-directory "~/git/notes")
+      (setq org-default-notes-file (concat org-directory "/notes.org"))
+      (setq org-agenda-files (list org-directory))
+      ;; set up my keymaps
+      (global-set-key (kbd "C-c l") 'org-store-link)
+      (global-set-key (kbd "C-c a") 'org-agenda)
+      (global-set-key (kbd "C-c c") 'org-capture)
+      ;; set up my capture templates
+      (setq org-capture-templates
+            '(("t" "Todo" entry (file+headline org-default-notes-file "Tasks")
+               "* TODO %?\n  %i\n  %a")
+              ("j" "Journal" entry (file+datetree org-default-notes-file)
+               "* %?\nEntered on %U\n  %i\n  %a")))
+      (org-babel-do-load-languages ;; load the languages for org-babel
+       'org-babel-load-languages
+       '((python . t)
+         (emacs-lisp . t)
+         (C . t)
+         (latex . t)
+         (clojure . t)
+         (ipython . t))))
 #+END_SRC
 ** org-bullets
 Get nice bullet points in org
