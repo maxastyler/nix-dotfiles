@@ -61,6 +61,7 @@ When using racer jump to definition, evil mode doesn't record the jumps correctl
    auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)) ;transform backups file name
    winner-mode 1 ;; winner mode lets you undo window config mistakes
    custom-file (expand-file-name "custom.el" user-emacs-directory)
+   inferior-lisp-program "sbcl" ; use sbcl as the lisp program
    tab-width 4) 				; tab width to 4
 #+END_SRC
 ** yes-or-no to y-or-n
@@ -432,6 +433,11 @@ Use rust-mode
     :defer t
     :config
     (add-hook 'rust-mode-hook 'cargo-minor-mode))
+#+END_SRC
+** SLIME
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package slime
+    :defer t)
 #+END_SRC
 
 ** tex
