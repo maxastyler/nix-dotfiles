@@ -440,6 +440,13 @@ Use rust-mode
     :defer t)
 #+END_SRC
 
+#+begin_src emacs-lisp :results silent
+  (use-package slime-company
+    :after slime
+    :config
+    (slime-setup '(slime-company)))
+#+end_src
+
 ** tex
 A package for dealing with latex in emacs. Add a buffer local hook to compile after saving.
 
