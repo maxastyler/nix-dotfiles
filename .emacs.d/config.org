@@ -62,6 +62,9 @@ When using racer jump to definition, evil mode doesn't record the jumps correctl
    winner-mode 1 ;; winner mode lets you undo window config mistakes
    custom-file (expand-file-name "custom.el" user-emacs-directory)
    inferior-lisp-program "sbcl" ; use sbcl as the lisp program
+   python-shell-interpreter "python3" ; use python3 as default
+   dired-listing-switches "-alh" ; give human readable sizes in dired listings
+   ring-bell-function #'ignore ; don't ring a bell, just ignore it
    tab-width 4) 				; tab width to 4
 #+END_SRC
 ** yes-or-no to y-or-n
@@ -77,12 +80,12 @@ when a "y" or "n" would do...
 ** Set a Backup Directory
 Use this directory instead of pumping out backup files into the wild
 #+BEGIN_SRC emacs-lisp :results silent
-(setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
-      backup-by-copying t
-      version-control t
-      delete-old-versions t
-      kept-new-versions 20
-      kept-old-versions 5)
+  (setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
+        backup-by-copying t
+        version-control t
+        delete-old-versions t
+        kept-new-versions 20
+        kept-old-versions 5)
 #+END_SRC
 ** Use package settings
 #+BEGIN_SRC emacs-lisp :results silent
@@ -181,12 +184,16 @@ Completion mode
 A nice python mode
 #+begin_src emacs-lisp :results silent
   (use-package elpy
-    :disabled
+    ;; :disabled
     :defer t
     :init
     (advice-add 'python-mode :before 'elpy-enable)
     :config
-    (add-hook 'python-mode-hook #'elpy-mode))
+    (add-hook 'python-mode-hook #'elpy-mode)
+    ;; add a hook to make the python shells project local
+    ;; (add-hook 'elpy-mode-hook (lambda () (elpy-shell-set-local-shell (elpy-project-root))))
+    )
+
 #+end_src
 
 ** Emacs-async
@@ -284,7 +291,7 @@ Language server protocol stuff
     :init (setq lsp-keymap-prefix "s-l")
     :commands lsp
     :config
-    (add-hook 'python-mode #'lsp)
+    ;; (add-hook 'python-mode #'lsp)
     (add-hook 'lsp-mode #'lsp-enable-which-key-integration))
 
   ;; optionally
@@ -327,35 +334,39 @@ Mode for syntax highlighting n that
 ** Org Babel
 Use the OB ipython package for nice jupyter integration with org
 #+BEGIN_SRC emacs-lisp :results silent
-  (use-package ob-ipython)
+  (use-package ob-ipython
+    :disabled t
+  )
 #+END_SRC
 ** org
 Organisation package
 #+BEGIN_SRC emacs-lisp :results silent
-    (use-package org
-      :config
-      (setq org-return-follows-link t)
-      (setq org-directory "~/git/notes")
-      (setq org-default-notes-file (concat org-directory "/notes.org"))
-      (setq org-agenda-files (list org-directory))
-      ;; set up my keymaps
-      (global-set-key (kbd "C-c l") 'org-store-link)
-      (global-set-key (kbd "C-c a") 'org-agenda)
-      (global-set-key (kbd "C-c c") 'org-capture)
-      ;; set up my capture templates
-      (setq org-capture-templates
-            '(("t" "Todo" entry (file+headline org-default-notes-file "Tasks")
-               "* TODO %?\n  %i\n  %a")
-              ("j" "Journal" entry (file+datetree org-default-notes-file)
-               "* %?\nEntered on %U\n  %i\n  %a")))
-      (org-babel-do-load-languages ;; load the languages for org-babel
-       'org-babel-load-languages
-       '((python . t)
-         (emacs-lisp . t)
-         (C . t)
-         (latex . t)
-         (clojure . t)
-         (ipython . t))))
+  (use-package org
+    :config
+    (setq org-return-follows-link t)
+    (setq org-directory "~/git/notes")
+    (setq org-default-notes-file (concat org-directory "/notes.org"))
+    (setq org-agenda-files (list org-directory))
+    (setq org-todo-keywords
+          '((sequence "TODO" "SOMEDAY" "|" "DONE" "CANCELLED")))
+    ;; set up my keymaps
+    (global-set-key (kbd "C-c l") 'org-store-link)
+    (global-set-key (kbd "C-c a") 'org-agenda)
+    (global-set-key (kbd "C-c c") 'org-capture)
+    ;; set up my capture templates
+    (setq org-capture-templates
+          '(("t" "Todo" entry (file+headline org-default-notes-file "Tasks")
+             "* TODO %?\n  %i\n  %a")
+            ("j" "Journal" entry (file+datetree org-default-notes-file)
+             "* %?\nEntered on %U\n  %i\n  %a")))
+    (org-babel-do-load-languages ;; load the languages for org-babel
+     'org-babel-load-languages
+     '((python . t)
+       (emacs-lisp . t)
+       (C . t)
+       (latex . t)
+       (clojure . t))))
+       ;; (ipython . t))))
 #+END_SRC
 ** org-bullets
 Get nice bullet points in org
@@ -428,24 +439,25 @@ Use rust-mode
 #+BEGIN_SRC emacs-lisp :results silent
   (use-package rust-mode
     :defer t)
-
+  (use-package rustic
+    :after rust-mode)
   (use-package cargo
+    :disabled t
     :defer t
     :config
-    (add-hook 'rust-mode-hook 'cargo-minor-mode))
+    (add-hook 'rust-mode-hook #'cargo-minor-mode))
 #+END_SRC
 ** SLIME
 #+BEGIN_SRC emacs-lisp :results silent
   (use-package slime
-    :defer t)
+    :defer t
+    :config
+    (slime-setup '(slime-fancy slime-company)))
 #+END_SRC
 
-#+begin_src emacs-lisp :results silent
-  (use-package slime-company
-    :after slime
-    :config
-    (slime-setup '(slime-company)))
-#+end_src
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package slime-company)
+#+END_SRC
 
 ** tex
 A package for dealing with latex in emacs. Add a buffer local hook to compile after saving.
