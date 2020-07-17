@@ -149,6 +149,7 @@ Completion mode
 ** DAP-mode
 #+BEGIN_SRC emacs-lisp :results silent
   (use-package dap-mode
+    :disabled
     :defer t
     :config
     (dap-mode 1)
