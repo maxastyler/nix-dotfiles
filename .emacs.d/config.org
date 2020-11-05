@@ -111,6 +111,12 @@ Use this directory instead of pumping out backup files into the wild
   (global-unset-key (kbd "C-z"))
   (global-unset-key (kbd "C-x C-z"))
 #+END_SRC
+** Scroll the compilation window
+We want the compilation window to scroll to the bottom
+#+BEGIN_SRC emacs-lisp :results silent
+  (setq compilation-scroll-output 1)
+#+END_SRC
+
 * Other Packages
 ** Ace window
 Package to change between windows n that
@@ -179,6 +185,13 @@ Completion mode
   (use-package dracula-theme
     :config
     (load-theme 'dracula t))
+#+END_SRC
+
+** Elixir mode
+#+BEGIN_SRC emacs-lisp :results silent
+  (use-package elixir-mode)
+  (use-package mix
+    :hook ((elixir-mode . mix-minor-mode)))
 #+END_SRC
 
 ** ELPY
@@ -289,12 +302,13 @@ Language server protocol stuff
 #+BEGIN_SRC emacs-lisp :results silent
   (use-package lsp-mode
     ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-    :init (setq lsp-keymap-prefix "s-l")
+    :init
+    (setq lsp-keymap-prefix "s-l")
+    (setq exec-path (append exec-path '("/home/mt3/.elixir-ls/")))
     :commands lsp
-    :config
-    ;; (add-hook 'python-mode #'lsp)
-    (add-hook 'lsp-mode #'lsp-enable-which-key-integration))
-
+    :hook ((lsp-mode . lsp-enable-which-key-integration)
+           (python-mode . lsp)
+           (elixir-mode . lsp)))
   ;; optionally
   (use-package lsp-ui :commands lsp-ui-mode)
   (use-package company-lsp :commands company-lsp)
